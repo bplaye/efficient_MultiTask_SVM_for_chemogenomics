@@ -1,8 +1,0 @@
-En ce qui concerne la lisibilité des plots, je suggère :
-   - de ne pas utiliser la couleur jaune
-   - éventuellement, changer la colormap pour une mieux adaptée aux daltoniens (cf https://bids.github.io/colormap/ ou https://github.com/nesanders/colorblind-colormap) ?
-   - d'utiliser une plus grosse épaisseur de ligne
-   - de refaire les xticks et yticks pour afficher un peu moins de valeurs, mais avec une plus grande taille de police
-   - d'augmenter la taille de police des axes et des légendes (quitte à reformuler les titre des axes pour qu'ils soient plus courts). Tant que tu y es, écrire AUPR en majuscules.
-   - en présentant plusieurs figures qui ont la même légende comme des sous-figures de la même figure, tu peux aussi n'afficher qu'une seule fois la légende et pouvoir faire des plots plus grands (par exemple, sur Fig 8, mettre la légende à l'intérieur du plot de 8(a) en jouant avec l'argument loc de legend).
-   - pour les plots maintenant présentés comme sous-figures de la même figure, il faut absolument que les échelles soient les mêmes (e.g. Fig 6).
