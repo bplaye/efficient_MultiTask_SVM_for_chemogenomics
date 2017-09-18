@@ -196,16 +196,15 @@ def plot_score_curve(title_local, list_of_list_of_score, list_of_list_of_score_s
     #print(list_of_list_of_score)
     #print(list_of_list_of_score_stdev)
     if plot_option=="save" or plot_option=="print_and_save":
-        f_out_local.write('\t')
         for i_el, el in enumerate(list_x_label_temp):
-            f_out_local.write(str(el)+' & ')
-        f_out_local.write('\\ \n \hline \n')
+            f_out_local.write(' & '+str(el))
+        f_out_local.write('\\\\ \n \hline \hline \n')
     
     for ind_local, list_score in enumerate(list_of_list_of_score):
         if plot_option=="save" or plot_option=="print_and_save":
-            f_out_local.write(list_x_names[ind_local]+' & ')
+            f_out_local.write(list_x_names[ind_local])
             for i_el, el in enumerate(list_x_label_temp):
-                f_out_local.write('AUPR='+str(round(100*list_score[i_el],2))+', std='+str(round(100*list_of_list_of_score_stdev[ind_local][i_el],2))+' & ')
+                f_out_local.write(' & $'+str(round(100*list_score[i_el],2))+' \pm '+str(round(100*list_of_list_of_score_stdev[ind_local][i_el],2))+'$')
             f_out_local.write('\\\\ \n \hline \n')
         
         plt.errorbar(list_x_label_temp, list_score, list_of_list_of_score_stdev[ind_local], color=list_color[ind_local], label=list_x_names[ind_local], linewidth=3.0,elinewidth=3,

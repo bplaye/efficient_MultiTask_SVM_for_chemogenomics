@@ -74,6 +74,7 @@ class ST_experiment(experiment_template):
         
         
     def make_prediction(self, couple_test, value_of_neg_class):
+        print('ST make_prediction')
         if self.type_ST=="MolView":
             list_train_samples, list_train_labels = self.make_ST_train_set(self.dico_target_of_mol[couple_test[1]][0], self.dico_target_of_mol[couple_test[1]][1], [couple_test[0]], self.K_prot, self.dico_prot2indice, self.threshold_prot, value_of_neg_class)
             K_train, K_test = self.make_Ktrain_and_Ktest_ST(list_train_samples, [couple_test[0]], self.K_prot, self.dico_prot2indice)
@@ -119,6 +120,8 @@ class ST_experiment(experiment_template):
         return Y_test_score
     
     def update_with_extra_task_pairs(self, couple_test, list_train_samples, list_train_labels):
+        print('ST extra task')
+        sys.stdout.flush()
         return list_train_samples, list_train_labels
     
     def load_list_couples(self, ind_sampling, value_of_neg_class):
@@ -130,7 +133,7 @@ class ST_experiment(experiment_template):
         if self.type_clf=="KernelRidge":
             value_of_neg_class = 0
         else:
-            value_of_neg_class = -1
+            value_of_neg_class = 0
 
         list_couples_tot, list_couples_labels = self.load_list_couples(ind_sampling, value_of_neg_class)
         nb_couples = math.floor(float(len(list_couples_tot))/float(50))
@@ -170,7 +173,7 @@ class ST_minus_experiment(ST_experiment):
     def __init__(self, type_ST, NbNeg, centile, nb_partial=50):
         ST_experiment.__init__(self,type_ST, NbNeg)
         self.centile = centile
-        self.name_neg = "saved_results/ST/STminus_LOOCV_pos_"+self.type_ST+"_S1_"+self.type_clf+"_NbNeg="+str(self.NbNeg)+"_Sd:"+str(self.centile)
+        self.name_pos = "saved_results/ST/STminus_LOOCV_pos_"+self.type_ST+"_S1_"+self.type_clf+"_NbNeg="+str(self.NbNeg)+"_Sd:"+str(self.centile)
         self.name_neg = "saved_results/ST/STminus_LOOCV_neg_"+self.type_ST+"_S1_"+self.type_clf+"_NbNeg="+str(self.NbNeg)+"_Sd:"+str(self.centile)
         self.nb_partial = nb_partial
         
@@ -187,16 +190,19 @@ class ST_minus_experiment(ST_experiment):
         return list_couples_tot_pos, list_couples_tot_neg
         
     def condition_on_intra_task(self, Kernel, dico_2indice, compared_sample, tested_sample, threshold):    
+#        print('intra task conditionned')
+#        sys.stdout.flush()
         return Kernel[dico_2indice[compared_sample], dico_2indice[tested_sample]]<=threshold
    
     def run(self, ind_partial, ind_sampling):
         if self.type_clf=="KernelRidge":
             value_of_neg_class = 0
         else:
-            value_of_neg_class = -1
+            value_of_neg_class = 0
 
         list_couples_tot_pos, list_couples_tot_neg = self.load_list_couples(ind_sampling, value_of_neg_class)
         nb_couples = math.floor(float(len(list_couples_tot_pos))/float(self.nb_partial))
+        print(nb_couples)
         if int(ind_partial)!=self.nb_partial-1:
             list_couples_pos_partial = list_couples_tot_pos[ind_partial*nb_couples:(1+ind_partial)*nb_couples].copy()
             list_couples_neg_partial = list_couples_tot_neg[ind_partial*nb_couples:(1+ind_partial)*nb_couples].copy()
@@ -209,6 +215,7 @@ class ST_minus_experiment(ST_experiment):
             list_pred_score.append([])
         for ind_couples in range(len(list_couples_pos_partial)):
             couple_test = list_couples_pos_partial[ind_couples]
+            print(couple_test)
             Y_test_score =self.make_prediction(couple_test, value_of_neg_class)
             for param in range(len(self.list_param)):
                 list_pred_score[param]+=Y_test_score[param]
@@ -230,7 +237,10 @@ if __name__ == '__main__':
         type_ST = 'Kron'
     elif 'MolView' in sys.argv[1]:
         type_ST = 'MolView'
-    NbNeg = int(sys.argv[2])
+    if sys.argv[2]=='full':
+        NbNeg = 'full'
+    else:    
+        NbNeg = int(sys.argv[2])
     ind_partial = int(sys.argv[3])
     ind_sampling = int(sys.argv[-1])    
     
@@ -241,3 +251,5 @@ if __name__ == '__main__':
     else:
         experiment = ST_experiment(type_ST, NbNeg)
         experiment.run(ind_partial, ind_sampling)
+        
+        

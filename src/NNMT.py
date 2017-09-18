@@ -1,5 +1,5 @@
 from src.ST import *
-
+import sys
 
 
 class NNMT_experiment(ST_experiment):
@@ -28,6 +28,8 @@ class NNMT_experiment(ST_experiment):
         """
         adding extra-task instances to the train set chosen as closer as possible to the tested sample
         """
+        print('current couple:', current_couple)
+        sys.stdout.flush()
         dico_neerest_pos_nei_per_couple_ID = []
         dico_neerest_neg_nei_per_couple_ID = []
 
@@ -48,6 +50,8 @@ class NNMT_experiment(ST_experiment):
         while pos_local<nb_pos_local or neg_local<nb_neg_local :
             max_ind = np.argmax(array_of_sim_value)
             compared_couple = (self.dico_neerest_nei_per_prot_ID[current_couple[0]][max_ind], self.dico_neerest_nei_per_mol_ID[current_couple[1]][array_of_sim_ind[max_ind]])
+#            print(self.dico_labels_per_couple[compared_couple[1] + compared_couple[0]])
+#            sys.stdout.flush()
             if compared_couple not in list_train_samples:
                 if compared_couple[0] != current_couple[0] and compared_couple[1] != current_couple[1]:
                     if self.condition_on_extra_task(current_couple, compared_couple):
@@ -63,6 +67,11 @@ class NNMT_experiment(ST_experiment):
                 array_of_sim_value[max_ind] = -1
             else:
                 array_of_sim_value[max_ind] = self.dico_neerest_nei_per_prot_value[current_couple[0]][max_ind] * self.dico_neerest_nei_per_mol_value[current_couple[1]][array_of_sim_ind[max_ind]]
+            if all(i >= len(self.dico_neerest_nei_per_mol_ID[current_couple[1]]) for i in array_of_sim_ind):
+                pos_local = nb_pos_local
+                neg_local = nb_neg_local
+                print('WARNING : all couples were spanned when finding neighboors')
+                sys.stdout.flush()
 
         if current_couple in dico_neerest_pos_nei_per_couple_ID:
                 print("current couple in list de neerest nei")
@@ -76,7 +85,7 @@ class NNMT_experiment(ST_experiment):
         list_train_samples_local = list_train_samples.copy() + dico_neerest_pos_nei_per_couple_ID + dico_neerest_neg_nei_per_couple_ID
         list_train_labels_local = list_train_labels.copy() + [1 for _ in range(len(dico_neerest_pos_nei_per_couple_ID))] + [value_of_neg_class for _ in range(len(dico_neerest_neg_nei_per_couple_ID))]
 
-        return list_train_samples, list_train_labels
+        return list_train_samples_local, list_train_labels_local
         
     def condition_on_extra_task(self, current_couple, compared_couple):
         return True
@@ -96,7 +105,7 @@ class NNMT_minus_experiment(NNMT_experiment, ST_minus_experiment):
     nb_partial : nb of subdivision of the computation
     """
     
-    def __init__(self, type_ST, NbNeg, PosNei, NegNei, centile, nb_partial=20):
+    def __init__(self, type_ST, NbNeg, PosNei, NegNei, centile, nb_partial=50):
         NNMT_experiment.__init__(self,type_ST, NbNeg, PosNei, NegNei)
         self.centile = centile
         self.nb_partial = nb_partial
@@ -108,6 +117,9 @@ class NNMT_minus_experiment(NNMT_experiment, ST_minus_experiment):
     
     def condition_on_intra_task(self, Kernel, dico_2indice, compared_sample, tested_sample, threshold):    
         return ST_minus_experiment.condition_on_intra_task(self, Kernel, dico_2indice, compared_sample, tested_sample, threshold)
+
+    def update_with_extra_task_pairs(self, current_couple, list_train_samples, list_train_labels, value_of_neg_class=0):
+        return NNMT_experiment.update_with_extra_task_pairs(self, current_couple, list_train_samples, list_train_labels, value_of_neg_class)
 
     def run(self, ind_partial, ind_sampling):
         return ST_minus_experiment.run(self, ind_partial, ind_sampling)
@@ -125,7 +137,7 @@ class NNMT_minusplus_experiment(NNMT_minus_experiment):
         Gives a maximum threshold of similarity between the tested sample and samples in the train set
     nb_partial : nb of subdivision of the computation
     """ 
-    def __init__(self, type_ST, NbNeg, PosNei, NegNei, centile, nb_partial=20):
+    def __init__(self, type_ST, NbNeg, PosNei, NegNei, centile, nb_partial=50):
         NNMT_minus_experiment.__init__(self,type_ST, NbNeg, PosNei, NegNei, centile, nb_partial)
         self.name_pos = "saved_results/ST/MTNeerestNei_minus+_pos_"+self.type_ST+"_S1_"+self.type_clf+"_NbNeg="+str(self.NbNeg)+'_PosNei'+str(PosNei)+'_NegNei='+str(NegNei)+"_Sd:"+str(self.centile)
         self.name_neg = "saved_results/ST/MTNeerestNei_minus+_neg_"+self.type_ST+"_S1_"+self.type_clf+"_NbNeg="+str(self.NbNeg)+'_PosNei'+str(PosNei)+'_NegNei='+str(NegNei)+"_Sd:"+str(self.centile)
@@ -137,7 +149,7 @@ class NNMT_minusplus_experiment(NNMT_minus_experiment):
 if __name__ == '__main__':     
     if 'Kron' in sys.argv[1]:
         type_ST = 'Kron'
-    NbNeg = int(sys.argv[2])
+    NbNeg = int(sys .argv[2])
     nb_pos = int(sys.argv[3])
     nb_neg = int(sys.argv[4])
     ind_partial = int(sys.argv[5])

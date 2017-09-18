@@ -5,9 +5,9 @@
 *\~
 src/[^~]*~
 submit_files/
-jobarray_parameters/
+jobarray_parameter/
 saved_results/
-.ipynb_checkpoints/                                                                          
+.ipynb_checkpoints/*                                                                          
 src/__pycache__                                                                             
 __pycache__
 data/

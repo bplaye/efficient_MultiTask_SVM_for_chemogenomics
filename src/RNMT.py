@@ -20,7 +20,7 @@ class RNMT_experiment(ST_experiment):
         self.list_neg_couples = pickle.load(open('data/pickles/ST/list_neg_couples.data', 'rb'))
         self.dico_labels_per_couple = pickle.load(open('data/pickles/ST/dico_labels_per_couple.data', 'rb'))
     
-    def update_with_extra_task_pairs(self, current_couple, list_train_samples, list_train_labels, value_of_neg_class):
+    def update_with_extra_task_pairs(self, current_couple, list_train_samples, list_train_labels, value_of_neg_class=0):
         """
         adding extra-task instances to the train set chosen randomly
         """
@@ -57,7 +57,7 @@ class RNMT_experiment(ST_experiment):
         list_train_samples_local = list_train_samples.copy() + random_pos_nei + random_neg_nei
         list_train_labels_local = list_train_labels.copy() + [1 for _ in range(len(random_pos_nei))] + [value_of_neg_class for _ in range(len(random_neg_nei))]
 
-        return list_train_samples, list_train_labels
+        return list_train_samples_local, list_train_labels_local
         
     def condition_on_extra_task(self, current_couple, compared_couple):
         return True
@@ -87,6 +87,9 @@ class RNMT_minus_experiment(RNMT_experiment, ST_minus_experiment):
     def load_list_couples(self, ind_sampling, value_of_neg_class):
         return ST_minus_experiment.load_list_couples(self, ind_sampling, value_of_neg_class)        
     
+    def update_with_extra_task_pairs(self, current_couple, list_train_samples, list_train_labels, value_of_neg_class=0):
+        return RNMT_experiment.update_with_extra_task_pairs(self, current_couple, list_train_samples, list_train_labels, value_of_neg_class)
+
     def condition_on_intra_task(self, Kernel, dico_2indice, compared_sample, tested_sample, threshold):    
         return ST_minus_experiment.condition_on_intra_task(self, Kernel, dico_2indice, compared_sample, tested_sample, threshold)
 
