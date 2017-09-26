@@ -7,14 +7,18 @@ src/[^~]*~
 submit_files/
 jobarray_parameter/
 saved_results/
-.ipynb_checkpoints/*                                                                          
-src/__pycache__                                                                             
+.ipynb_checkpoints/
+src/__pycache__/
 __pycache__
-data/
+data/data_on_families/
+data/kernels/
+data/pickles/
 docs/
 dico_neerest_nei/
 dico_pred_final/
-!data/datasets/
+study_on_withdrawn_mol/*
+!study_on_withdrawn_mol/wd.tsv
+!study_on_withdrawn_mol/wd_consideredmol.tsv
 
 plot_MolKernel.ipynb
 plot_ProtKernel.ipynb
