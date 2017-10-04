@@ -4,7 +4,8 @@
 This is the code to reproduce all findings from the following paper:
 
 Benoit, Playe and Chloé-Agathe, Azencott and Véronique, Stoven. "Efficient Multi-Task chemogenomics for drug specificity prediction." 
-link to paper
+https://www.biorxiv.org/content/early/2017/09/24/193391
+
 "
 Adverse drug reactions (also called side effects) often interrupt the long and costly process of drug development. Side effects occur when drugs bind to proteins other than their intended target. As experimentally testing drug specificity against the entire proteome is out of reach, we investigate in this paper the application of chemogenomics approaches.
 
